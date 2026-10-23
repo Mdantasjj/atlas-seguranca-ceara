@@ -31,14 +31,6 @@
         <span>184 municípios · 14 regiões de planejamento</span>
       </div>
 
-      <section class="ais-map-panel" id="aisMapPanel" hidden aria-label="Controle das ocorrências por AIS">
-        <div class="section-title"><span>Ocorrências por AIS</span><b id="aisPeriod">JAN–SET 2026</b></div>
-        <label for="aisNatureSelect">Natureza da ocorrência</label>
-        <select id="aisNatureSelect"></select>
-        <div class="ais-map-summary" id="aisSummary"></div>
-        <p>As cores representam as AIS diretamente no mapa.</p>
-      </section>
-
       <svg id="mapSvg" viewBox="0 0 900 760" role="img" aria-label="Mapa do Ceará dividido por municípios">
         <g id="municipalityLayer"></g>
         <g id="regionBoundaryLayer"></g>
@@ -56,9 +48,6 @@
         <button id="resetView" type="button" aria-label="Voltar ao mapa do Ceará">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M8 21H3v-5m13 5h5v-5"/></svg>
         </button>
-        <button id="dataButton" type="button" aria-label="Dados e camadas" aria-expanded="false" aria-controls="dataPanel">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18V9m6 9V5m6 13v-7m4 7H2"/></svg>
-        </button>
         <button id="infoButton" type="button" aria-label="Fontes e metodologia">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 7.5v.2"/></svg>
         </button>
@@ -74,47 +63,6 @@
         <span></span><b>BASE EM VALIDAÇÃO</b>
       </div>
 
-      <aside class="data-panel" id="dataPanel" aria-hidden="true" aria-label="Dados e camadas analíticas">
-        <div class="data-panel-head">
-          <div><small>ANÁLISE TERRITORIAL</small><strong>Dados e camadas</strong></div>
-          <button id="dataPanelClose" type="button" aria-label="Fechar painel">×</button>
-        </div>
-
-        <section class="data-section">
-          <label for="metricSelect">Indicador exibido</label>
-          <select id="metricSelect"></select>
-          <label for="levelSelect">Unidade territorial</label>
-          <select id="levelSelect">
-            <option value="municipio">Município</option>
-            <option value="regiao">Região de planejamento</option>
-            <option value="ais">Área Integrada de Segurança (AIS)</option>
-            <option value="bairro">Bairro</option>
-            <option value="distrito">Distrito</option>
-            <option value="localidade">Localidade</option>
-          </select>
-          <p class="field-note" id="metricNote">A base regional do IPECE permanece como visualização padrão.</p>
-        </section>
-
-        <section class="data-section">
-          <div class="section-title"><span>Camadas pontuais</span><b id="pointCount">0 registros</b></div>
-          <label class="check-row"><input id="occurrenceToggle" type="checkbox" disabled><span>Ocorrências georreferenciadas</span></label>
-          <label class="check-row"><input id="resourceToggle" type="checkbox" disabled><span>Efetivo, viaturas e equipamentos</span></label>
-        </section>
-
-        <section class="data-section import-section">
-          <div class="section-title"><span>Carregar dados</span><b>CSV · JSON · GEOJSON</b></div>
-          <button class="import-button" id="importButton" type="button">Selecionar arquivos</button>
-          <input id="dataFileInput" type="file" accept=".csv,.json,.geojson" multiple hidden>
-          <p class="field-note">Processamento local: os arquivos não são enviados para a internet.</p>
-          <div class="import-status" id="importStatus">Nenhum dado operacional carregado.</div>
-        </section>
-
-        <div class="data-summary" id="dataSummary">
-          <div><strong>0</strong><span>indicadores</span></div>
-          <div><strong>0</strong><span>ocorrências</span></div>
-          <div><strong>0</strong><span>recursos</span></div>
-        </div>
-      </aside>
     </section>
   </main>
 
@@ -127,7 +75,7 @@
       <div><dt>Indicadores</dt><dd>IDM Global 2019–2022 para os 184 municípios · IPECE. PIB municipal 2023 para municípios destacados no informe IPECE/IBGE.</dd></div>
       <div><dt>Municípios</dt><dd>Malha político-administrativa e nomenclatura municipal · IBGE.</dd></div>
       <div><dt>Bairros</dt><dd>Malha oficial disponível para 105 municípios. Fortaleza utiliza Prefeitura/IPLANFOR; demais recortes utilizam a malha de setores do Censo 2022.</dd></div>
-      <div><dt>Novos dados</dt><dd>O painel aceita indicadores, ocorrências, recursos e geometrias em CSV, JSON ou GeoJSON. O processamento do arquivo é feito localmente no navegador.</dd></div>
+      <div><dt>Novos dados</dt><dd>A estrutura está preparada para incorporar indicadores, ocorrências, recursos e geometrias validados em novas atualizações da base.</dd></div>
       <div><dt>Ocorrências 2026</dt><dd>497.094 ocorrências atendidas por 34 AIS, entre 1º de janeiro e 30 de setembro de 2026. Dados operacionais fornecidos pelo usuário; divisão territorial conforme tabela SIP/DIEST/SUPESP/SSPDS de 2026.</dd></div>
     </dl>
     <p class="method-note">Não inclua nomes de vítimas, documentos, telefones ou outros dados pessoais. Ocorrências sensíveis devem ser anonimizadas ou agregadas antes da visualização.</p>

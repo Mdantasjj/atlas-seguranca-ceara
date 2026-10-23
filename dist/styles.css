@@ -57,10 +57,6 @@ button{color:inherit}
 .map-context{position:absolute;left:50%;top:20px;z-index:8;transform:translateX(-50%);display:flex;align-items:center;gap:9px;max-width:calc(100vw - 730px);min-width:0;color:#41504c;white-space:nowrap;pointer-events:none}
 .map-context strong{font:600 10px "DM Mono",monospace;letter-spacing:.1em}
 .map-context span{min-width:0;font-size:9px;overflow:hidden;text-overflow:ellipsis;color:#7a8783}
-.ais-map-panel{position:absolute;left:22px;top:78px;z-index:9;width:min(310px,calc(100vw - 110px));display:grid;gap:8px;padding:13px;background:rgba(255,255,255,.95);border:1px solid rgba(209,218,213,.94);border-radius:10px;box-shadow:var(--shadow);backdrop-filter:blur(12px)}
-.ais-map-panel[hidden]{display:none}.ais-map-panel>label{font:500 8px "DM Mono",monospace;letter-spacing:.08em;color:#586762;text-transform:uppercase}.ais-map-panel select{width:100%;height:36px;border:1px solid #d6ded9;border-radius:7px;background:#fff;padding:0 9px;color:#26332f;font-size:10px;outline:none}.ais-map-panel select:focus{border-color:#6e978c;box-shadow:0 0 0 3px rgba(82,132,119,.1)}
-.ais-map-panel>p{margin:0;color:#788580;font-size:8px;line-height:1.4}.ais-map-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#dfe6e2;border:1px solid #dfe6e2;border-radius:7px;overflow:hidden}.ais-map-summary div{display:grid;gap:2px;padding:8px 5px;background:#f7f9f7;text-align:center}.ais-map-summary strong{font:600 11px "DM Mono",monospace;color:#315e59}.ais-map-summary span{font-size:7px;line-height:1.25;color:#788580}
-
 .map-controls{position:absolute;right:22px;top:20px;z-index:10;display:grid;background:rgba(255,255,255,.94);border:1px solid rgba(217,224,220,.92);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);backdrop-filter:blur(12px)}
 .map-controls button{width:40px;height:39px;border:0;border-bottom:1px solid #e5e9e6;background:transparent;display:grid;place-items:center;cursor:pointer;font-size:18px;transition:background .15s,color .15s}
 .map-controls button:last-child{border-bottom:0}
@@ -88,21 +84,6 @@ button{color:inherit}
 .data-quality span{width:7px;height:7px;border-radius:50%;background:#739c8f;box-shadow:0 0 0 4px rgba(115,156,143,.12)}
 .data-quality.error span{background:#b85f5f}
 
-.data-panel{position:absolute;z-index:20;right:74px;top:20px;width:min(360px,calc(100vw - 110px));max-height:calc(100vh - 40px);overflow:auto;background:rgba(255,255,255,.97);border:1px solid #dbe2de;border-radius:14px;box-shadow:0 24px 70px rgba(24,41,37,.19);backdrop-filter:blur(16px);transform:translateX(calc(100% + 100px));opacity:0;pointer-events:none;transition:transform .28s cubic-bezier(.22,.8,.25,1),opacity .2s}
-.data-panel.open{transform:translateX(0);opacity:1;pointer-events:auto}
-.data-panel-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:17px 18px;background:rgba(255,255,255,.96);border-bottom:1px solid #e1e7e3}
-.data-panel-head div{display:grid;gap:3px}.data-panel-head small{font:500 8px "DM Mono",monospace;letter-spacing:.12em;color:#72817c}.data-panel-head strong{font-size:15px}
-.data-panel-head button{width:30px;height:30px;border:0;border-radius:50%;background:#eff3f1;color:#5e6c68;font-size:19px;cursor:pointer}
-.data-section{display:grid;gap:8px;padding:16px 18px;border-bottom:1px solid #e5eae7}
-.data-section>label:not(.check-row),.section-title span{font:500 8px "DM Mono",monospace;letter-spacing:.08em;color:#586762;text-transform:uppercase}
-.data-section select{width:100%;height:38px;border:1px solid #d6ded9;border-radius:7px;background:#fff;padding:0 10px;color:#26332f;font-size:11px;outline:none}
-.data-section select:focus{border-color:#6e978c;box-shadow:0 0 0 3px rgba(82,132,119,.1)}
-.field-note{margin:2px 0 0;color:#788580;font-size:9px;line-height:1.5}
-.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:2px}.section-title b{font:400 8px "DM Mono",monospace;color:#84908c}
-.check-row{display:flex;align-items:center;gap:9px;font-size:10px;color:#4f5e59}.check-row input{accent-color:#315e59}.check-row:has(input:disabled){opacity:.45}
-.import-button{height:38px;border:1px solid #315e59;border-radius:7px;background:#315e59;color:#fff;font-size:10px;font-weight:600;cursor:pointer}.import-button:hover{background:#264c47}
-.import-status{padding:10px;border-radius:7px;background:#f1f5f2;color:#66736f;font-size:9px;line-height:1.45}.import-status.success{background:#eaf3ee;color:#315e59}.import-status.error{background:#f8ecec;color:#8c4343}
-.data-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#e4e9e6}.data-summary div{display:grid;gap:2px;padding:13px 10px;background:#fafbf9;text-align:center}.data-summary strong{font:600 15px "DM Mono",monospace;color:#315e59}.data-summary span{font-size:8px;color:#75827e}
 .metric-legend{grid-template-columns:repeat(5,1fr)!important;gap:0!important}
 .metric-legend .legend-item{display:grid;gap:3px;text-align:center}.metric-legend .legend-item i{width:100%;height:9px;border-radius:0}.metric-legend .legend-item span{font-size:7px;overflow:hidden;text-overflow:clip;white-space:nowrap}
 
@@ -128,7 +109,6 @@ dialog h2{margin:0 0 20px;font-size:22px}
   .map-controls button{width:40px;height:38px}
   .map-context{top:62px;left:12px;transform:none;max-width:calc(100vw - 24px)}
   .map-context strong{font-size:9px}.map-context span{font-size:8px}
-  .ais-map-panel{left:12px;top:62px;width:calc(100vw - 76px);padding:10px}
   .region-legend{left:12px;right:68px;bottom:12px;width:auto}
   .legend-heading{margin-bottom:5px}.legend-items{grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 10px}
   .legend-item{font-size:7px}.legend-item i{width:8px;height:8px}
@@ -136,7 +116,6 @@ dialog h2{margin:0 0 20px;font-size:22px}
   .data-quality{right:12px;bottom:12px;writing-mode:vertical-rl}.data-quality b{display:none}
   .search-control kbd{display:none}
   .source-list div{grid-template-columns:1fr;gap:5px}
-  .data-panel{right:8px;top:62px;width:calc(100vw - 16px);max-height:calc(100vh - 74px)}
 }
 @media(max-height:620px){
   .legend-items{grid-template-columns:repeat(3,minmax(0,1fr))}.region-legend{width:500px}

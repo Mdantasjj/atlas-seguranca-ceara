@@ -90,4 +90,4 @@ O arquivo `dist/data/ais-ocorrencias-2026.js` foi consolidado a partir de um rel
 
 No relatório original, cada combinação era repetida conforme sua quantidade total e a última linha do grupo recebia campos adicionais de rodapé. A rotina `scripts/import-ais-report.js` usa uma única quantidade por combinação `AIS + natureza` e valida se a soma consolidada coincide com a quantidade de linhas do relatório.
 
-Como o relatório não contém geometrias das AIS, municípios, bairros ou coordenadas, a visualização é apresentada em ranking analítico. Nenhum valor foi associado por aproximação aos municípios do mapa.
+Como o relatório não contém geometrias, a associação territorial usa a tabela oficial de 2026 da SIP/DIEST/SUPESP/SSPDS, registrada em `dist/data/ais-territorios-2026.js`. Os municípios são coloridos diretamente; Fortaleza e Caucaia utilizam as malhas de bairros. Dendê e Praia de Iracema permanecem sem classificação porque não aparecem associados a uma AIS na tabela consultada. A cobertura pode ser verificada com `node scripts/validate-ais-territories.js`.

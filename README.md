@@ -15,7 +15,7 @@ Mapa territorial interativo do Ceará preparado para estudos de segurança públ
 
 O projeto inclui 497.094 ocorrências atendidas, agregadas por 34 Áreas Integradas de Segurança (AIS), de 1º de janeiro a 30 de setembro de 2026. O painel permite filtrar 602 naturezas e comparar o volume entre as AIS.
 
-O relatório recebido não contém geometrias das AIS, municípios, bairros ou coordenadas. Por isso, estes dados são apresentados em ranking analítico e não são atribuídos artificialmente aos polígonos municipais.
+O relatório recebido não contém geometrias, mas a divisão territorial vigente foi reconstruída a partir da tabela oficial de 2026 da SIP/DIEST/SUPESP/SSPDS. Os municípios são coloridos diretamente no mapa; Fortaleza e Caucaia usam seus recortes de bairros. Dendê e Praia de Iracema permanecem neutros porque a tabela oficial consultada não os atribui a uma AIS.
 
 Para regenerar a base consolidada a partir do relatório original em Windows-1252:
 

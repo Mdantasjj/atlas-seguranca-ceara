@@ -31,6 +31,9 @@ button{color:inherit}
 .neighborhood-label{display:none;fill:#263632;font:600 7.4px Manrope,Arial,sans-serif;text-anchor:middle;dominant-baseline:middle;pointer-events:none;paint-order:stroke;stroke:rgba(255,255,255,.96);stroke-width:3px;stroke-linejoin:round;letter-spacing:.01em}
 .neighborhood-label.major,.neighborhood-label.active,#neighborhoodLabelLayer.all-visible .neighborhood-label{display:block}
 .neighborhood-label.active{fill:#112723;font-weight:700}
+.ais-overlay{fill:var(--ais-color,#e8ece9);stroke:#fff;stroke-width:1;vector-effect:non-scaling-stroke;cursor:pointer;transition:filter .14s}
+.ais-overlay:hover,.ais-overlay:focus{filter:brightness(.82);outline:none;stroke-width:1.8}
+.ais-map-label{fill:#293934;font:700 7px "DM Mono",monospace;text-anchor:middle;dominant-baseline:middle;pointer-events:none;paint-order:stroke;stroke:rgba(255,255,255,.96);stroke-width:2.4px;stroke-linejoin:round}
 .map-point{vector-effect:non-scaling-stroke;stroke:#fff;stroke-width:1.5;cursor:pointer;transition:r .12s,opacity .12s}
 .map-point:hover{r:5.5}
 .map-point.occurrence{fill:#9b4f4f}
@@ -54,6 +57,9 @@ button{color:inherit}
 .map-context{position:absolute;left:50%;top:20px;z-index:8;transform:translateX(-50%);display:flex;align-items:center;gap:9px;max-width:calc(100vw - 730px);min-width:0;color:#41504c;white-space:nowrap;pointer-events:none}
 .map-context strong{font:600 10px "DM Mono",monospace;letter-spacing:.1em}
 .map-context span{min-width:0;font-size:9px;overflow:hidden;text-overflow:ellipsis;color:#7a8783}
+.ais-map-panel{position:absolute;left:22px;top:78px;z-index:9;width:min(310px,calc(100vw - 110px));display:grid;gap:8px;padding:13px;background:rgba(255,255,255,.95);border:1px solid rgba(209,218,213,.94);border-radius:10px;box-shadow:var(--shadow);backdrop-filter:blur(12px)}
+.ais-map-panel[hidden]{display:none}.ais-map-panel>label{font:500 8px "DM Mono",monospace;letter-spacing:.08em;color:#586762;text-transform:uppercase}.ais-map-panel select{width:100%;height:36px;border:1px solid #d6ded9;border-radius:7px;background:#fff;padding:0 9px;color:#26332f;font-size:10px;outline:none}.ais-map-panel select:focus{border-color:#6e978c;box-shadow:0 0 0 3px rgba(82,132,119,.1)}
+.ais-map-panel>p{margin:0;color:#788580;font-size:8px;line-height:1.4}.ais-map-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#dfe6e2;border:1px solid #dfe6e2;border-radius:7px;overflow:hidden}.ais-map-summary div{display:grid;gap:2px;padding:8px 5px;background:#f7f9f7;text-align:center}.ais-map-summary strong{font:600 11px "DM Mono",monospace;color:#315e59}.ais-map-summary span{font-size:7px;line-height:1.25;color:#788580}
 
 .map-controls{position:absolute;right:22px;top:20px;z-index:10;display:grid;background:rgba(255,255,255,.94);border:1px solid rgba(217,224,220,.92);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);backdrop-filter:blur(12px)}
 .map-controls button{width:40px;height:39px;border:0;border-bottom:1px solid #e5e9e6;background:transparent;display:grid;place-items:center;cursor:pointer;font-size:18px;transition:background .15s,color .15s}
@@ -97,14 +103,8 @@ button{color:inherit}
 .import-button{height:38px;border:1px solid #315e59;border-radius:7px;background:#315e59;color:#fff;font-size:10px;font-weight:600;cursor:pointer}.import-button:hover{background:#264c47}
 .import-status{padding:10px;border-radius:7px;background:#f1f5f2;color:#66736f;font-size:9px;line-height:1.45}.import-status.success{background:#eaf3ee;color:#315e59}.import-status.error{background:#f8ecec;color:#8c4343}
 .data-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#e4e9e6}.data-summary div{display:grid;gap:2px;padding:13px 10px;background:#fafbf9;text-align:center}.data-summary strong{font:600 15px "DM Mono",monospace;color:#315e59}.data-summary span{font-size:8px;color:#75827e}
-.ais-section{gap:10px}
-.ais-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#dfe6e2;border:1px solid #dfe6e2;border-radius:8px;overflow:hidden}
-.ais-summary div{display:grid;gap:3px;padding:10px 6px;background:#f7f9f7;text-align:center}.ais-summary strong{font:600 12px "DM Mono",monospace;color:#315e59}.ais-summary span{font-size:7px;line-height:1.3;color:#788580}
-.ais-ranking{display:grid;gap:5px;max-height:260px;overflow:auto;padding:2px 4px 2px 0;scrollbar-width:thin;scrollbar-color:#b7c4bf transparent}
-.ais-rank-row{display:grid;grid-template-columns:19px 38px minmax(70px,1fr) 48px;align-items:center;gap:6px;min-height:18px}
-.ais-rank-row small{font:7px "DM Mono",monospace;color:#9aa4a0}.ais-rank-row b{font:500 8px "DM Mono",monospace;color:#43534e}.ais-rank-row>span{height:6px;border-radius:4px;background:#edf1ef;overflow:hidden}.ais-rank-row i{display:block;height:100%;min-width:1px;border-radius:4px;background:#a9675d}.ais-rank-row strong{font:500 8px "DM Mono",monospace;text-align:right;color:#52615c}
 .metric-legend{grid-template-columns:repeat(5,1fr)!important;gap:0!important}
-.metric-legend .legend-item{display:grid;gap:3px;text-align:center}.metric-legend .legend-item i{width:100%;height:9px;border-radius:0}.metric-legend .legend-item span{font-size:7px;overflow:visible}
+.metric-legend .legend-item{display:grid;gap:3px;text-align:center}.metric-legend .legend-item i{width:100%;height:9px;border-radius:0}.metric-legend .legend-item span{font-size:7px;overflow:hidden;text-overflow:clip;white-space:nowrap}
 
 .tooltip{position:fixed;z-index:30;pointer-events:none;max-width:310px;padding:0;color:#17211f;font-size:10px;font-weight:700;line-height:1.45;white-space:pre-line;opacity:0;transform:translate(11px,11px);text-shadow:0 1px 0 #fff,1px 0 0 #fff,0 -1px 0 #fff,-1px 0 0 #fff;transition:opacity .08s}
 .eyebrow{font:500 9px "DM Mono",monospace;letter-spacing:.15em;color:#70807b;margin-bottom:10px}
@@ -128,6 +128,7 @@ dialog h2{margin:0 0 20px;font-size:22px}
   .map-controls button{width:40px;height:38px}
   .map-context{top:62px;left:12px;transform:none;max-width:calc(100vw - 24px)}
   .map-context strong{font-size:9px}.map-context span{font-size:8px}
+  .ais-map-panel{left:12px;top:62px;width:calc(100vw - 76px);padding:10px}
   .region-legend{left:12px;right:68px;bottom:12px;width:auto}
   .legend-heading{margin-bottom:5px}.legend-items{grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 10px}
   .legend-item{font-size:7px}.legend-item i{width:8px;height:8px}

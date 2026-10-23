@@ -79,11 +79,21 @@
           <select id="levelSelect">
             <option value="municipio">Município</option>
             <option value="regiao">Região de planejamento</option>
+            <option value="ais">Área Integrada de Segurança (AIS)</option>
             <option value="bairro">Bairro</option>
             <option value="distrito">Distrito</option>
             <option value="localidade">Localidade</option>
           </select>
           <p class="field-note" id="metricNote">A base regional do IPECE permanece como visualização padrão.</p>
+        </section>
+
+        <section class="data-section ais-section" id="aisSection" hidden>
+          <div class="section-title"><span>Ocorrências por AIS</span><b id="aisPeriod">JAN–SET 2026</b></div>
+          <label for="aisNatureSelect">Natureza da ocorrência</label>
+          <select id="aisNatureSelect"></select>
+          <div class="ais-summary" id="aisSummary"></div>
+          <div class="ais-ranking" id="aisRanking" aria-label="Ranking de ocorrências por AIS"></div>
+          <p class="field-note">Base agregada por AIS. O arquivo não contém municípios, bairros, coordenadas ou a malha geográfica das AIS.</p>
         </section>
 
         <section class="data-section">
@@ -119,6 +129,7 @@
       <div><dt>Municípios</dt><dd>Malha político-administrativa e nomenclatura municipal · IBGE.</dd></div>
       <div><dt>Bairros</dt><dd>Malha oficial disponível para 105 municípios. Fortaleza utiliza Prefeitura/IPLANFOR; demais recortes utilizam a malha de setores do Censo 2022.</dd></div>
       <div><dt>Novos dados</dt><dd>O painel aceita indicadores, ocorrências, recursos e geometrias em CSV, JSON ou GeoJSON. O processamento do arquivo é feito localmente no navegador.</dd></div>
+      <div><dt>Ocorrências 2026</dt><dd>497.094 ocorrências atendidas por 34 AIS, entre 1º de janeiro e 30 de setembro de 2026. Relatório operacional agregado fornecido pelo usuário.</dd></div>
     </dl>
     <p class="method-note">Não inclua nomes de vítimas, documentos, telefones ou outros dados pessoais. Ocorrências sensíveis devem ser anonimizadas ou agregadas antes da visualização.</p>
   </dialog>
@@ -127,6 +138,7 @@
   <script src="data/data-schema.js"></script>
   <script src="data/data-engine.js"></script>
   <script src="data/operational-data.js"></script>
+  <script src="data/ais-ocorrencias-2026.js"></script>
   <script src="data/map-data.js"></script>
   <script src="data/ipece-indicadores.js"></script>
   <script src="app.js"></script>

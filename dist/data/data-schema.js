@@ -4,6 +4,7 @@ window.ATLAS_SCHEMA={
   levels:[
     {id:'estado',label:'Estado'},
     {id:'regiao',label:'Região de planejamento'},
+    {id:'ais',label:'Área Integrada de Segurança (AIS)'},
     {id:'municipio',label:'Município'},
     {id:'distrito',label:'Distrito'},
     {id:'bairro',label:'Bairro'},
@@ -36,6 +37,7 @@ window.ATLAS_SCHEMA={
     {id:'efetivo_policial',label:'Efetivo policial',category:'Recursos policiais',unit:'policiais',aggregation:'sum',direction:'positive'},
     {id:'viaturas',label:'Viaturas',category:'Recursos policiais',unit:'viaturas',aggregation:'sum',direction:'positive'},
     {id:'ocorrencias',label:'Ocorrências',category:'Segurança',unit:'ocorrências',aggregation:'count',direction:'negative'},
+    {id:'ais_ocorrencias_2026',label:'Ocorrências atendidas por AIS · 2026',category:'Segurança',unit:'ocorrências',aggregation:'sum',direction:'negative'},
     {id:'ocorrencias_canceladas',label:'Ocorrências canceladas',category:'Atendimento',unit:'ocorrências',aggregation:'count',direction:'negative'},
     {id:'tempo_atendimento',label:'Tempo médio de atendimento',category:'Atendimento',unit:'min',aggregation:'average',direction:'negative'},
     {id:'roubos',label:'Roubos',category:'Criminalidade',unit:'ocorrências',aggregation:'count',direction:'negative'},

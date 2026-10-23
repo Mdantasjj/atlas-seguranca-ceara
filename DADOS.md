@@ -78,3 +78,16 @@ Também é possível entregar um único arquivo JSON:
 8. Para séries históricas, usar uma linha por indicador, território e período.
 
 Os arquivos podem ser carregados pelo painel **Dados e camadas** no próprio mapa. O carregamento é local ao navegador e não envia dados para a internet.
+
+## Base AIS de ocorrências atendidas · 2026
+
+O arquivo `dist/data/ais-ocorrencias-2026.js` foi consolidado a partir de um relatório operacional em Windows-1252, referente ao período de 1º de janeiro a 30 de setembro de 2026.
+
+- 497.094 ocorrências atendidas;
+- 34 Áreas Integradas de Segurança;
+- 602 naturezas distintas;
+- 7.524 combinações únicas de AIS e natureza.
+
+No relatório original, cada combinação era repetida conforme sua quantidade total e a última linha do grupo recebia campos adicionais de rodapé. A rotina `scripts/import-ais-report.js` usa uma única quantidade por combinação `AIS + natureza` e valida se a soma consolidada coincide com a quantidade de linhas do relatório.
+
+Como o relatório não contém geometrias das AIS, municípios, bairros ou coordenadas, a visualização é apresentada em ranking analítico. Nenhum valor foi associado por aproximação aos municípios do mapa.

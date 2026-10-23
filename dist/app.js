@@ -12,7 +12,7 @@ const state={
   features:[],regionFeatures:[],names:new Map(),idsByName:new Map(),regions:new Map(),
   neighborhoods:new Map(),indicators:{},project:null,activeProject:null,currentCity:null,selectedMunicipality:null,
   transform:{scale:1,x:0,y:0},dataEngine:null,activeMetric:'base',activeLevel:'municipio',
-  showOccurrences:false,showResources:false
+  showOccurrences:false,showResources:false,activeNature:'all'
 };
 
 const $=selector=>document.querySelector(selector);
@@ -136,6 +136,59 @@ function formatMetricValue(value,unit=''){
   return unit?`${formatted} ${unit}`:formatted;
 }
 
+function aisMetricValues(nature='all'){
+  const values=new Map();
+  (window.ATLAS_AIS_DATA?.areas||[]).forEach(area=>{
+    const value=nature==='all'?area.total:(area.naturezas.find(item=>item[0]===nature)?.[1]||0);
+    values.set(area.id,value);
+  });
+  return values;
+}
+
+function aisNatureCatalog(){
+  const totals=new Map();
+  (window.ATLAS_AIS_DATA?.areas||[]).forEach(area=>area.naturezas.forEach(([nature,value])=>totals.set(nature,(totals.get(nature)||0)+value)));
+  return[...totals].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'pt-BR'));
+}
+
+function renderAisAnalytics(){
+  const data=window.ATLAS_AIS_DATA;
+  const section=$('#aisSection');
+  if(!section||!data)return;
+  section.hidden=false;
+  $('#aisPeriod').textContent=data.period.label.toLocaleUpperCase('pt-BR');
+  const values=aisMetricValues(state.activeNature);
+  const ranked=[...values].sort((a,b)=>b[1]-a[1]);
+  const total=ranked.reduce((sum,item)=>sum+item[1],0);
+  const active=ranked.filter(item=>item[1]>0).length;
+  const maximum=Math.max(...ranked.map(item=>item[1]),1);
+  const summary=$('#aisSummary');summary.replaceChildren();
+  [[total.toLocaleString('pt-BR'),'ocorrências'],[active.toLocaleString('pt-BR'),'AIS com registros'],[data.natureCount.toLocaleString('pt-BR'),'naturezas na base']].forEach(([value,label])=>{
+    const item=document.createElement('div'),strong=document.createElement('strong'),span=document.createElement('span');
+    strong.textContent=value;span.textContent=label;item.append(strong,span);summary.appendChild(item);
+  });
+  const ranking=$('#aisRanking');ranking.replaceChildren();
+  ranked.forEach(([id,value],index)=>{
+    const row=document.createElement('div');row.className='ais-rank-row';
+    const rank=document.createElement('small');rank.textContent=String(index+1).padStart(2,'0');
+    const name=document.createElement('b');name.textContent=id;
+    const track=document.createElement('span'),bar=document.createElement('i');bar.style.width=`${value/maximum*100}%`;track.appendChild(bar);
+    const amount=document.createElement('strong');amount.textContent=value.toLocaleString('pt-BR');
+    row.append(rank,name,track,amount);ranking.appendChild(row);
+  });
+}
+
+function setupAisPanel(){
+  const data=window.ATLAS_AIS_DATA,select=$('#aisNatureSelect');
+  if(!data||!select)return;
+  select.replaceChildren();
+  const totalOption=document.createElement('option');totalOption.value='all';totalOption.textContent=`Todas as naturezas · ${data.total.toLocaleString('pt-BR')}`;select.appendChild(totalOption);
+  aisNatureCatalog().forEach(([nature,total])=>{
+    const option=document.createElement('option');option.value=nature;option.textContent=`${nature} · ${total.toLocaleString('pt-BR')}`;select.appendChild(option);
+  });
+  select.addEventListener('change',()=>{state.activeNature=select.value;applyMetric()});
+}
+
 function municipalityTooltip(name,id,region){
   const lines=[`${name} · ${region}`,indicatorText(name)];
   if(state.activeMetric!=='base'){
@@ -218,6 +271,7 @@ function applyMetric(){
   state.metricValues=new Map();state.metricMeta=null;
 
   if(state.activeMetric==='base'){
+    const aisSection=$('#aisSection');if(aisSection)aisSection.hidden=true;
     restoreRegionColors();renderRegionLegend();
     if(note)note.textContent='A base regional do IPECE permanece como visualização padrão.';
     return;
@@ -231,10 +285,10 @@ function applyMetric(){
     state.activeLevel='municipio';
     state.metricMeta={label:'PIB municipal 2023',unit:'R$',direction:'positive',period:'IPECE/IBGE · 2023'};
     Object.entries(state.indicators).forEach(([name,item])=>{if(item.pib2023Mil)state.metricValues.set(state.idsByName.get(name)||name,item.pib2023Mil*1000)});
-  }else if(['bairro','distrito','localidade'].includes(state.activeLevel)){
-    restoreRegionColors();
-    const geometryCount=renderCustomGeometries(min,max,palette);
-    if(note)note.textContent=geometryCount?`${geometryCount} geometrias de ${state.activeLevel} preparadas para ${state.metricMeta.label}.`:`Carregue a geometria de ${state.activeLevel} em GeoJSON para visualizar este nível.`;
+  }else if(state.activeMetric==='ais_ocorrencias_2026'){
+    state.activeLevel='ais';
+    state.metricMeta={label:'Ocorrências atendidas por AIS',unit:'ocorrências',direction:'negative',period:'01 jan – 30 set 2026'};
+    state.metricValues=aisMetricValues(state.activeNature);
   }else{
     const meta=state.dataEngine.metricCatalog().find(item=>item.id===state.activeMetric)||{label:state.activeMetric,unit:'',direction:'neutral'};
     state.metricMeta=meta;
@@ -247,7 +301,12 @@ function applyMetric(){
   const min=values.length?Math.min(...values):0,max=values.length?Math.max(...values):0;
   const palette=paletteFor(state.metricMeta.direction);
 
-  if(state.currentCity&&state.activeLevel==='bairro'){
+  const aisSection=$('#aisSection');if(aisSection)aisSection.hidden=state.activeLevel!=='ais';
+  if(state.activeLevel==='ais'){
+    restoreRegionColors();
+    renderAisAnalytics();
+    if(note)note.textContent='Ranking analítico por AIS. A malha geográfica das AIS não consta no relatório recebido.';
+  }else if(state.currentCity&&state.activeLevel==='bairro'){
     const cityId=state.idsByName.get(state.currentCity);
     neighborhoodLayer.querySelectorAll('.neighborhood-map').forEach(path=>{
       const name=path.dataset.name;
@@ -257,6 +316,10 @@ function applyMetric(){
       path.classList.toggle('no-data',!color);
     });
     if(note)note.textContent=`${values.length} bairros com valor para ${state.metricMeta.label}.`;
+  }else if(['bairro','distrito','localidade'].includes(state.activeLevel)){
+    restoreRegionColors();
+    const geometryCount=renderCustomGeometries(min,max,palette);
+    if(note)note.textContent=geometryCount?`${geometryCount} geometrias de ${state.activeLevel} preparadas para ${state.metricMeta.label}.`:`Carregue a geometria de ${state.activeLevel} em GeoJSON para visualizar este nível.`;
   }else if(['municipio','regiao'].includes(state.activeLevel)&&!state.currentCity){
     municipalityLayer.querySelectorAll('.municipality').forEach(path=>{
       const value=state.activeLevel==='regiao'?state.metricValues.get(path.dataset.region):(state.metricValues.get(path.dataset.id)??state.metricValues.get(path.dataset.name));
@@ -269,7 +332,8 @@ function applyMetric(){
     restoreRegionColors();
     if(note)note.textContent=`Selecione um município com a geometria de ${state.activeLevel} disponível para visualizar este nível.`;
   }
-  renderMetricLegend(state.metricMeta,state.metricValues);
+  if(state.activeLevel==='ais')renderRegionLegend();
+  else renderMetricLegend(state.metricMeta,state.metricValues);
 }
 
 function updateDataSummary(){
@@ -307,8 +371,12 @@ function setupDataPanel(){
   const setOpen=open=>{panel.classList.toggle('open',open);panel.setAttribute('aria-hidden',String(!open));button.setAttribute('aria-expanded',String(open))};
   button.addEventListener('click',()=>setOpen(!panel.classList.contains('open')));
   close.addEventListener('click',()=>setOpen(false));
-  refreshMetricOptions();updateDataSummary();
-  $('#metricSelect').addEventListener('change',event=>{state.activeMetric=event.target.value;applyMetric()});
+  setupAisPanel();refreshMetricOptions();updateDataSummary();
+  $('#metricSelect').addEventListener('change',event=>{
+    state.activeMetric=event.target.value;
+    if(state.activeMetric!=='ais_ocorrencias_2026'&&state.activeLevel==='ais')state.activeLevel='municipio';
+    applyMetric();
+  });
   $('#levelSelect').addEventListener('change',event=>{state.activeLevel=event.target.value;applyMetric()});
   $('#occurrenceToggle').addEventListener('change',event=>{state.showOccurrences=event.target.checked;renderOperationalPoints()});
   $('#resourceToggle').addEventListener('change',event=>{state.showResources=event.target.checked;renderOperationalPoints()});
@@ -395,6 +463,12 @@ async function init(){
     state.regionFeatures=regionLimits.features;
     state.indicators=window.IPECE_INDICADORES?.municipios||{};
     state.dataEngine=new window.AtlasDataEngine(window.ATLAS_SCHEMA,window.ATLAS_DATA_PACKAGE);
+    if(window.ATLAS_AIS_DATA){
+      state.dataEngine.merge({indicadores:window.ATLAS_AIS_DATA.areas.map(area=>({
+        indicador:'ais_ocorrencias_2026',nivel:'ais',ais:area.id,valor:area.total,
+        periodo:window.ATLAS_AIS_DATA.period.label,unidade:'ocorrências',fonte:window.ATLAS_AIS_DATA.source
+      }))});
+    }
     cities.forEach(city=>{
       const id=String(city.id);
       state.names.set(id,city.nome);

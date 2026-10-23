@@ -152,6 +152,7 @@
 
     territorialKey(row,level){
       if(level==='regiao')return normalizedKey(row.regiao);
+      if(level==='ais')return normalizedKey(row.ais);
       if(level==='municipio')return normalizedKey(row.codigo_ibge||row.municipio);
       if(level==='bairro')return normalizedKey(`${row.codigo_ibge||row.municipio||''}::${row.bairro||''}`);
       if(level==='distrito')return normalizedKey(`${row.codigo_ibge||row.municipio||''}::${row.distrito||''}`);

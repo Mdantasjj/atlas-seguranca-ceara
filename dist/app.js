@@ -748,6 +748,10 @@ mapSvg.addEventListener('wheel',event=>{
   zoomAt(state.transform.scale*Math.exp(-event.deltaY*.0015),x,y);
 },{passive:false});
 
+mapSvg.addEventListener('pointerup',event=>{
+  if(typeof event.target.blur==='function')event.target.blur();
+});
+
 mapSvg.addEventListener('dblclick',event=>{
   event.preventDefault();
   const rect=mapSvg.getBoundingClientRect();

@@ -16,21 +16,22 @@ button{color:inherit}
 #mapSvg.drag-active{cursor:grabbing}
 #municipalityLayer,#regionBoundaryLayer,#neighborhoodLayer{transition:transform .48s cubic-bezier(.22,.8,.25,1)}
 #mapSvg.interacting #municipalityLayer,#mapSvg.interacting #regionBoundaryLayer,#mapSvg.interacting #neighborhoodLayer{transition:none}
-.municipality{fill:var(--region-color,#ccd4cf);stroke:#fff;stroke-width:1;vector-effect:non-scaling-stroke;transition:filter .14s,opacity .18s,stroke-width .14s;cursor:pointer}
-.municipality:hover{filter:brightness(.91) saturate(1.05)}
-.municipality.focused{filter:brightness(.78) saturate(1.08);stroke:#fff;stroke-width:2.2}
+.municipality{fill:var(--region-color,#ccd4cf);stroke:#fff;stroke-width:1;vector-effect:non-scaling-stroke;transition:opacity .18s,stroke-width .14s;cursor:pointer;filter:none;outline:none}
+.municipality:hover{opacity:.88;filter:none}
+.municipality.focused{filter:none;stroke:#fff;stroke-width:2.2}
 .municipality.dim{opacity:.18}
 .municipality.no-data{fill:#e8ece9!important;opacity:.72}
-.municipality:focus-visible,.neighborhood-map:focus-visible{outline:none;filter:brightness(.92);stroke:#fff;stroke-width:2.2}
+.municipality:focus-visible,.neighborhood-map:focus-visible{outline:none;filter:none;stroke:#fff;stroke-width:2.2}
 .region-boundary{fill:none;stroke:#fff;stroke-width:3.2;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke;pointer-events:none}
-.neighborhood-map{fill:var(--district-fill,color-mix(in srgb,var(--city-color,#9fbeb7) 70%,#fff));stroke:#fff;stroke-width:1.65;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke;transition:fill .12s,filter .12s;cursor:pointer;filter:none}
+.neighborhood-map{fill:var(--district-fill,color-mix(in srgb,var(--city-color,#9fbeb7) 70%,#fff));stroke:#fff;stroke-width:1.65;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke;transition:fill .12s,opacity .12s;cursor:pointer;filter:none;outline:none}
 .neighborhood-map:hover,.neighborhood-map:focus,.neighborhood-map.selected{fill:color-mix(in srgb,var(--city-color,#315e59) 84%,#203c37);stroke:#fff;stroke-width:2.25;filter:none;outline:none}
 .neighborhood-map.no-data{fill:#e8ece9;opacity:.75}
 .neighborhood-label{display:none;fill:#263632;font:600 7.4px Manrope,Arial,sans-serif;text-anchor:middle;dominant-baseline:middle;pointer-events:none;paint-order:stroke;stroke:rgba(255,255,255,.96);stroke-width:3px;stroke-linejoin:round;letter-spacing:.01em}
 .neighborhood-label.major,.neighborhood-label.active,#neighborhoodLabelLayer.all-visible .neighborhood-label{display:block}
 .neighborhood-label.active{fill:#112723;font-weight:700}
-.ais-overlay{fill:var(--ais-color,#e8ece9);stroke:#fff;stroke-width:1;vector-effect:non-scaling-stroke;cursor:pointer;transition:filter .14s}
-.ais-overlay:hover,.ais-overlay:focus{filter:brightness(.82);outline:none;stroke-width:1.8}
+.ais-overlay{fill:var(--ais-color,#e8ece9);stroke:#fff;stroke-width:1;vector-effect:non-scaling-stroke;cursor:pointer;transition:opacity .14s;filter:none;outline:none}
+.ais-overlay:hover,.ais-overlay:focus{filter:none;opacity:.82;outline:none;stroke-width:1.8}
+#mapSvg path,#mapSvg circle,#mapSvg :focus{outline:none!important}
 .ais-map-label{fill:#293934;font:700 7px "DM Mono",monospace;text-anchor:middle;dominant-baseline:middle;pointer-events:none;paint-order:stroke;stroke:rgba(255,255,255,.96);stroke-width:2.4px;stroke-linejoin:round}
 .map-point{vector-effect:non-scaling-stroke;stroke:#fff;stroke-width:1.5;cursor:pointer;transition:r .12s,opacity .12s}
 .map-point:hover{r:5.5}

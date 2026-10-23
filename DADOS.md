@@ -77,7 +77,13 @@ Também é possível entregar um único arquivo JSON:
 7. Remover ou agregar dados que permitam identificar pessoas.
 8. Para séries históricas, usar uma linha por indicador, território e período.
 
-Os arquivos podem ser carregados pelo painel **Dados e camadas** no próprio mapa. O carregamento é local ao navegador e não envia dados para a internet.
+Os arquivos recebidos devem ser validados e incorporados à base do projeto. A visualização pública mantém as informações exclusivamente no mapa, sem painel lateral de filtros.
+
+## População e área territorial · 2022
+
+O arquivo `dist/data/ibge-demografia.js` contém população residente, área territorial e densidade demográfica dos 184 municípios do Ceará. A fonte é a tabela 4714 do SIDRA/IBGE, referente ao Censo Demográfico 2022.
+
+A rotina `scripts/generate-ibge-demography.js` cruza os registros pelo código IBGE de sete dígitos e exige os três campos para todos os municípios antes de gerar a base.
 
 ## Base AIS de ocorrências atendidas · 2026
 

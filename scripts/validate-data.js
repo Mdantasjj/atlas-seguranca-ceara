@@ -5,7 +5,7 @@ const vm = require('vm');
 const root = path.resolve(__dirname, '..');
 const context = { window: {} };
 vm.createContext(context);
-for (const file of ['dist/data/map-data.js', 'dist/data/ipece-indicadores.js']) {
+for (const file of ['dist/data/map-data.js', 'dist/data/ipece-indicadores.js', 'dist/data/ibge-demografia.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), context, { filename: file });
 }
 
@@ -14,12 +14,15 @@ const errors = [];
 const assert = (condition, message) => { if (!condition) errors.push(message); };
 const cityNames = new Set(data.CEARA_MUNICIPIOS.map(item => item.nome));
 const cityIds = new Set(data.CEARA_MUNICIPIOS.map(item => String(item.id)));
+const cityById = new Map(data.CEARA_MUNICIPIOS.map(item => [String(item.id), item.nome]));
 const geoIds = new Set(data.CEARA_GEOJSON.features.map(item => String(item.properties.codarea)));
 const regionIds = new Set(data.CEARA_REGIOES.map(item => String(item.codigo)));
 const regionNames = new Set(data.CEARA_REGIOES.map(item => item.regiao));
 const indicators = data.IPECE_INDICADORES.municipios;
 const indicatorNames = new Set(Object.keys(indicators));
 const neighborhoodCities = new Set(data.CEARA_BAIRROS.features.map(item => item.properties.Municipio));
+const demographics = data.IBGE_DEMOGRAFIA.municipalities;
+const demographicIds = new Set(Object.keys(demographics));
 
 assert(cityNames.size === 184, `Municípios: ${cityNames.size}/184`);
 assert(geoIds.size === 184, `Geometrias municipais: ${geoIds.size}/184`);
@@ -29,12 +32,21 @@ assert(data.CEARA_REGION_LIMITS.features.length === 14, `Limites regionais: ${da
 assert(indicatorNames.size === 184, `IDM: ${indicatorNames.size}/184`);
 assert(data.CEARA_BAIRROS.features.length === 1311, `Bairros: ${data.CEARA_BAIRROS.features.length}/1311`);
 assert(neighborhoodCities.size === 105, `Municípios com bairros: ${neighborhoodCities.size}/105`);
+assert(demographicIds.size === 184, `Dados demográficos: ${demographicIds.size}/184`);
 
 for (const id of cityIds) assert(geoIds.has(id), `Município ${id} sem geometria`);
 for (const id of cityIds) assert(regionIds.has(id), `Município ${id} sem região`);
 for (const name of cityNames) assert(indicatorNames.has(name), `${name} sem IDM`);
 for (const name of indicatorNames) assert(cityNames.has(name), `IDM sem município correspondente: ${name}`);
 for (const name of neighborhoodCities) assert(cityNames.has(name), `Bairros vinculados a município desconhecido: ${name}`);
+for (const id of cityIds) assert(demographicIds.has(id), `Município ${id} sem dados demográficos`);
+for (const [id,item] of Object.entries(demographics)) {
+  assert(cityIds.has(id), `Dados demográficos sem município correspondente: ${id}`);
+  assert(cityById.get(id) === item.name, `Nome demográfico divergente em ${id}: ${item.name}`);
+  assert(Number.isInteger(item.population) && item.population > 0, `População inválida: ${id}`);
+  assert(Number.isFinite(item.areaKm2) && item.areaKm2 > 0, `Área territorial inválida: ${id}`);
+  assert(Number.isFinite(item.density) && item.density > 0, `Densidade inválida: ${id}`);
+}
 
 const ranks = new Set();
 for (const [name, item] of Object.entries(indicators)) {
@@ -51,6 +63,9 @@ const report = {
   indicadoresIdm: indicatorNames.size,
   bairros: data.CEARA_BAIRROS.features.length,
   municipiosComBairros: neighborhoodCities.size,
+  municipiosComDemografia: demographicIds.size,
+  populacaoCeara2022: Object.values(demographics).reduce((sum,item)=>sum+item.population,0),
+  areaCearaKm2: Number(Object.values(demographics).reduce((sum,item)=>sum+item.areaKm2,0).toFixed(3)),
   municipiosComPib2023: Object.values(indicators).filter(item => item.pib2023Mil).length,
   melhorIdm2022: Object.entries(indicators).sort((a, b) => a[1].rank2022 - b[1].rank2022)[0][0]
 };

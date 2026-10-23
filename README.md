@@ -8,12 +8,13 @@ Mapa territorial interativo do Ceará preparado para estudos de segurança públ
 - malhas de bairros disponíveis para 105 municípios;
 - detalhamento de Fortaleza, Caucaia e Juazeiro do Norte;
 - busca, seleção, zoom, deslocamento e identificação territorial;
-- estrutura para importar indicadores, ocorrências, efetivo, viaturas e equipamentos em CSV, JSON ou GeoJSON;
+- estrutura de dados para incorporar indicadores, ocorrências, efetivo, viaturas e equipamentos;
+- população residente, área territorial e densidade demográfica dos 184 municípios (IBGE, Censo 2022);
 - dados de referência do IDM e PIB municipal.
 
 ## Primeira base operacional
 
-O projeto inclui 497.094 ocorrências atendidas, agregadas por 34 Áreas Integradas de Segurança (AIS), de 1º de janeiro a 30 de setembro de 2026. O painel permite filtrar 602 naturezas e comparar o volume entre as AIS.
+O projeto inclui 497.094 ocorrências atendidas, agregadas por 34 Áreas Integradas de Segurança (AIS), de 1º de janeiro a 30 de setembro de 2026. Os totais são apresentados diretamente no mapa, sem filtros laterais.
 
 O relatório recebido não contém geometrias, mas a divisão territorial vigente foi reconstruída a partir da tabela oficial de 2026 da SIP/DIEST/SUPESP/SSPDS. Os municípios são coloridos diretamente no mapa; Fortaleza e Caucaia usam seus recortes de bairros. Dendê e Praia de Iracema permanecem neutros porque a tabela oficial consultada não os atribui a uma AIS.
 
@@ -22,6 +23,12 @@ Para regenerar a base consolidada a partir do relatório original em Windows-125
 ```bash
 node scripts/import-ais-report.js "caminho/relatorio.csv" dist/data/ais-ocorrencias-2026.js
 node scripts/validate-ais-data.js
+```
+
+Para atualizar a base demográfica com a tabela 4714 do SIDRA/IBGE:
+
+```bash
+node scripts/generate-ibge-demography.js
 ```
 
 ## Executar localmente

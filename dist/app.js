@@ -85,6 +85,15 @@ function formatGdp(thousands){
   return `R$ ${billions.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})} bi`;
 }
 
+function demographicsText(id,compact=false){
+  const item=window.IBGE_DEMOGRAFIA?.municipalities?.[String(id)];
+  if(!item)return'';
+  const population=Number(item.population).toLocaleString('pt-BR');
+  const area=Number(item.areaKm2).toLocaleString('pt-BR',{minimumFractionDigits:3,maximumFractionDigits:3});
+  const density=Number(item.density).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return[`População 2022 ${population}`,`Área ${area} km²`,`Densidade ${density} hab./km²`].join(compact?' · ':'\n');
+}
+
 function mixHex(base,target='#ffffff',weight=.65){
   const parse=color=>color.replace('#','').match(/.{2}/g).map(value=>parseInt(value,16));
   const [br,bg,bb]=parse(base),[tr,tg,tb]=parse(target);
@@ -229,7 +238,7 @@ function renderAisMap(min,max,palette){
 }
 
 function municipalityTooltip(name,id,region){
-  const lines=[`${name} · ${region}`,indicatorText(name)];
+  const lines=[`${name} · ${region}`,demographicsText(id),indicatorText(name)];
   if(state.activeMetric!=='base'){
     const ais=state.activeLevel==='ais'?aisForMunicipality(name):null;
     const value=ais?state.metricValues.get(ais):activeMetricValueForMunicipality(name,id,region);
@@ -416,10 +425,12 @@ function validateData(){
   const regionNames=new Set(state.regions.values());
   const assigned=[...state.regions.values()].filter(Boolean).length;
   const idmCount=Object.keys(state.indicators).length;
+  const demographicsCount=Object.keys(window.IBGE_DEMOGRAFIA?.municipalities||{}).length;
   if(state.features.length!==184)errors.push(`${state.features.length}/184 municípios`);
   if(assigned!==184)errors.push(`${assigned}/184 regionalizados`);
   if(regionNames.size!==14)errors.push(`${regionNames.size}/14 regiões`);
   if(idmCount!==184)errors.push(`${idmCount}/184 indicadores IDM`);
+  if(demographicsCount!==184)errors.push(`${demographicsCount}/184 dados demográficos`);
   if(state.regionFeatures.length!==14)errors.push(`${state.regionFeatures.length}/14 limites regionais`);
   const quality=$('#dataQuality');
   quality.classList.toggle('error',Boolean(errors.length));
@@ -488,7 +499,7 @@ function renderState(){
     const id=String(feature.properties.codarea);
     const name=state.names.get(id)||id;
     const region=state.regions.get(id)||'Sem classificação';
-    const description=`${name}, ${region}. ${indicatorText(name,true)}`;
+    const description=`${name}, ${region}. ${demographicsText(id,true)}. ${indicatorText(name,true)}`;
     const path=el('path',{
       d:pathData(feature.geometry,project),class:'municipality','data-id':id,'data-name':name,
       'data-region':region,'data-base-color':REGION_COLORS[region]||'#ccd4cf',style:`--region-color:${REGION_COLORS[region]||'#ccd4cf'}`,
@@ -598,7 +609,7 @@ async function openCity(name){
 
   if(neighborhoodFeatures.length||name==='Fortaleza'){
     state.currentCity=name;
-    setContext(name.toLocaleUpperCase('pt-BR'),`${region} · ${neighborhoodFeatures.length||121} bairros · ${indicatorText(name,true)}`);
+    setContext(name.toLocaleUpperCase('pt-BR'),`${region} · ${neighborhoodFeatures.length||121} bairros · ${demographicsText(id,true)} · ${indicatorText(name,true)}`);
     await showNeighborhoods(name,region);
   }else{
     state.currentCity=null;
@@ -607,7 +618,7 @@ async function openCity(name){
     regionBoundaryLayer.style.display='';
     $('#regionLegend').classList.remove('hidden');
     setMunicipalitySelection(id);
-    setContext(name.toLocaleUpperCase('pt-BR'),`${region} · sem malha oficial de bairros · ${indicatorText(name,true)}`);
+    setContext(name.toLocaleUpperCase('pt-BR'),`${region} · sem malha oficial de bairros · ${demographicsText(id,true)} · ${indicatorText(name,true)}`);
     zoomToMunicipality(id);
     applyMetric();
     renderOperationalPoints();

@@ -85,6 +85,14 @@ O arquivo `dist/data/ibge-demografia.js` contém população residente, área te
 
 A rotina `scripts/generate-ibge-demography.js` cruza os registros pelo código IBGE de sete dígitos e exige os três campos para todos os municípios antes de gerar a base.
 
+## Atividades econômicas municipais
+
+O arquivo `dist/data/ibge-atividades-economicas.js` reúne as unidades locais do Cadastro Central de Empresas (CEMPRE) nos 184 municípios, conforme a tabela 9528 do SIDRA/IBGE, ano de referência 2024. A base inclui o total de unidades locais e os recortes de indústria, comércio, educação e Administração Pública.
+
+A medida de indústria soma as seções CNAE B a F: indústrias extrativas, indústrias de transformação, eletricidade e gás, água/esgoto/resíduos e construção. Educação corresponde à seção CNAE P; Administração Pública, à seção CNAE O. Esses dois últimos valores são unidades locais classificadas por atividade econômica, e não inventários físicos completos de escolas ou prédios públicos.
+
+A rotina `scripts/generate-ibge-economic-activities.js` consulta a API de agregados do IBGE, normaliza os nomes municipais, cruza os registros pelo código IBGE de sete dígitos e exige todas as categorias para os 184 municípios antes de gerar a base.
+
 ## Base AIS de ocorrências atendidas · 2026
 
 O arquivo `dist/data/ais-ocorrencias-2026.js` foi consolidado a partir de um relatório operacional em Windows-1252, referente ao período de 1º de janeiro a 30 de setembro de 2026.

@@ -5,7 +5,7 @@ const vm = require('vm');
 const root = path.resolve(__dirname, '..');
 const context = { window: {} };
 vm.createContext(context);
-for (const file of ['dist/data/map-data.js', 'dist/data/ipece-indicadores.js', 'dist/data/ibge-demografia.js']) {
+for (const file of ['dist/data/map-data.js', 'dist/data/ipece-indicadores.js', 'dist/data/ibge-demografia.js', 'dist/data/ibge-atividades-economicas.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), context, { filename: file });
 }
 
@@ -23,6 +23,8 @@ const indicatorNames = new Set(Object.keys(indicators));
 const neighborhoodCities = new Set(data.CEARA_BAIRROS.features.map(item => item.properties.Municipio));
 const demographics = data.IBGE_DEMOGRAFIA.municipalities;
 const demographicIds = new Set(Object.keys(demographics));
+const economicActivities = data.IBGE_ATIVIDADES_ECONOMICAS.municipalities;
+const economicIds = new Set(Object.keys(economicActivities));
 
 assert(cityNames.size === 184, `Municípios: ${cityNames.size}/184`);
 assert(geoIds.size === 184, `Geometrias municipais: ${geoIds.size}/184`);
@@ -33,6 +35,7 @@ assert(indicatorNames.size === 184, `IDM: ${indicatorNames.size}/184`);
 assert(data.CEARA_BAIRROS.features.length === 1311, `Bairros: ${data.CEARA_BAIRROS.features.length}/1311`);
 assert(neighborhoodCities.size === 105, `Municípios com bairros: ${neighborhoodCities.size}/105`);
 assert(demographicIds.size === 184, `Dados demográficos: ${demographicIds.size}/184`);
+assert(economicIds.size === 184, `Atividades econômicas: ${economicIds.size}/184`);
 
 for (const id of cityIds) assert(geoIds.has(id), `Município ${id} sem geometria`);
 for (const id of cityIds) assert(regionIds.has(id), `Município ${id} sem região`);
@@ -46,6 +49,15 @@ for (const [id,item] of Object.entries(demographics)) {
   assert(Number.isInteger(item.population) && item.population > 0, `População inválida: ${id}`);
   assert(Number.isFinite(item.areaKm2) && item.areaKm2 > 0, `Área territorial inválida: ${id}`);
   assert(Number.isFinite(item.density) && item.density > 0, `Densidade inválida: ${id}`);
+}
+for (const id of cityIds) assert(economicIds.has(id), `Município ${id} sem atividades econômicas`);
+for (const [id,item] of Object.entries(economicActivities)) {
+  assert(cityIds.has(id), `Atividades econômicas sem município correspondente: ${id}`);
+  assert(cityById.get(id) === item.name, `Nome econômico divergente em ${id}: ${item.name}`);
+  for (const field of ['totalUnits','industry','commerce','education','publicAdministration']) {
+    assert(Number.isInteger(item[field]) && item[field] >= 0, `${field} inválido: ${id}`);
+    assert(item[field] <= item.totalUnits, `${field} maior que o total: ${id}`);
+  }
 }
 
 const ranks = new Set();
@@ -64,6 +76,12 @@ const report = {
   bairros: data.CEARA_BAIRROS.features.length,
   municipiosComBairros: neighborhoodCities.size,
   municipiosComDemografia: demographicIds.size,
+  municipiosComAtividadesEconomicas: economicIds.size,
+  unidadesLocaisCeara2024: Object.values(economicActivities).reduce((sum,item)=>sum+item.totalUnits,0),
+  industriaCeara2024: Object.values(economicActivities).reduce((sum,item)=>sum+item.industry,0),
+  comercioCeara2024: Object.values(economicActivities).reduce((sum,item)=>sum+item.commerce,0),
+  educacaoCeara2024: Object.values(economicActivities).reduce((sum,item)=>sum+item.education,0),
+  administracaoPublicaCeara2024: Object.values(economicActivities).reduce((sum,item)=>sum+item.publicAdministration,0),
   populacaoCeara2022: Object.values(demographics).reduce((sum,item)=>sum+item.population,0),
   areaCearaKm2: Number(Object.values(demographics).reduce((sum,item)=>sum+item.areaKm2,0).toFixed(3)),
   municipiosComPib2023: Object.values(indicators).filter(item => item.pib2023Mil).length,

@@ -94,6 +94,17 @@ function demographicsText(id,compact=false){
   return[`População 2022 ${population}`,`Área ${area} km²`,`Densidade ${density} hab./km²`].join(compact?' · ':'\n');
 }
 
+function economicActivityText(id,compact=false){
+  const item=window.IBGE_ATIVIDADES_ECONOMICAS?.municipalities?.[String(id)];
+  if(!item)return'';
+  const number=value=>Number(value).toLocaleString('pt-BR');
+  return[
+    `Economia 2024 ${number(item.totalUnits)} unidades locais`,
+    `Indústria ${number(item.industry)} · Comércio ${number(item.commerce)}`,
+    `Educação ${number(item.education)} · Administração pública ${number(item.publicAdministration)}`
+  ].join(compact?' · ':'\n');
+}
+
 function mixHex(base,target='#ffffff',weight=.65){
   const parse=color=>color.replace('#','').match(/.{2}/g).map(value=>parseInt(value,16));
   const [br,bg,bb]=parse(base),[tr,tg,tb]=parse(target);
@@ -224,11 +235,20 @@ function renderAisMap(min,max,palette){
   });
 
   ['Fortaleza','Caucaia'].forEach(city=>{
+    const cityId=state.idsByName.get(city);
+    const region=state.regions.get(cityId)||'Sem classificação';
     (state.neighborhoods.get(city)||[]).forEach(feature=>{
       const name=feature.properties.Nome||'',ais=aisForNeighborhood(city,name);
       if(!ais)return;
-      const path=el('path',{d:pathData(feature.geometry,state.project),class:'ais-overlay','data-ais':ais,tabindex:'0','aria-label':`${ais}, ${name}, ${city}: ${formatMetricValue(state.metricValues.get(ais),'ocorrências')}`,style:`--ais-color:${colorFor(ais)}`});
-      path.addEventListener('pointermove',event=>showTip(`${ais.replace('AIS','AIS ')} · ${name} · ${city}\n${formatMetricValue(state.metricValues.get(ais),'ocorrências')}`,event));
+      const details=()=>[
+        `${ais.replace('AIS','AIS ')} · ${name} · ${city}`,
+        formatMetricValue(state.metricValues.get(ais),'ocorrências'),
+        demographicsText(cityId),
+        economicActivityText(cityId),
+        indicatorText(city)
+      ].filter(Boolean).join('\n');
+      const path=el('path',{d:pathData(feature.geometry,state.project),class:'ais-overlay','data-ais':ais,tabindex:'0','aria-label':`${ais}, ${name}, ${city}, ${region}. ${demographicsText(cityId,true)}. ${economicActivityText(cityId,true)}. ${formatMetricValue(state.metricValues.get(ais),'ocorrências')}`,style:`--ais-color:${colorFor(ais)}`});
+      path.addEventListener('pointermove',event=>showTip(details(),event));
       path.addEventListener('pointerleave',hideTip);
       path.addEventListener('click',()=>openCity(city));
       customGeometryLayer.appendChild(path);
@@ -238,7 +258,7 @@ function renderAisMap(min,max,palette){
 }
 
 function municipalityTooltip(name,id,region){
-  const lines=[`${name} · ${region}`,demographicsText(id),indicatorText(name)];
+  const lines=[`${name} · ${region}`,demographicsText(id),economicActivityText(id),indicatorText(name)];
   if(state.activeMetric!=='base'){
     const ais=state.activeLevel==='ais'?aisForMunicipality(name):null;
     const value=ais?state.metricValues.get(ais):activeMetricValueForMunicipality(name,id,region);
@@ -410,12 +430,12 @@ function setContext(title,description){
 function showTip(text,event){
   tooltip.textContent=text;
   const margin=18;
-  const estimatedWidth=Math.min(310,Math.max(130,text.length*4.4));
-  const left=Math.min(event.clientX+11,window.innerWidth-estimatedWidth-margin);
-  const top=Math.min(event.clientY+11,window.innerHeight-90);
+  tooltip.style.opacity='1';
+  const box=tooltip.getBoundingClientRect();
+  const left=Math.min(event.clientX,window.innerWidth-box.width-margin-11);
+  const top=Math.min(event.clientY,window.innerHeight-box.height-margin-11);
   tooltip.style.left=`${Math.max(margin,left)}px`;
   tooltip.style.top=`${Math.max(margin,top)}px`;
-  tooltip.style.opacity='1';
 }
 
 function hideTip(){tooltip.style.opacity='0'}
@@ -426,11 +446,13 @@ function validateData(){
   const assigned=[...state.regions.values()].filter(Boolean).length;
   const idmCount=Object.keys(state.indicators).length;
   const demographicsCount=Object.keys(window.IBGE_DEMOGRAFIA?.municipalities||{}).length;
+  const economicCount=Object.keys(window.IBGE_ATIVIDADES_ECONOMICAS?.municipalities||{}).length;
   if(state.features.length!==184)errors.push(`${state.features.length}/184 municípios`);
   if(assigned!==184)errors.push(`${assigned}/184 regionalizados`);
   if(regionNames.size!==14)errors.push(`${regionNames.size}/14 regiões`);
   if(idmCount!==184)errors.push(`${idmCount}/184 indicadores IDM`);
   if(demographicsCount!==184)errors.push(`${demographicsCount}/184 dados demográficos`);
+  if(economicCount!==184)errors.push(`${economicCount}/184 dados econômicos`);
   if(state.regionFeatures.length!==14)errors.push(`${state.regionFeatures.length}/14 limites regionais`);
   const quality=$('#dataQuality');
   quality.classList.toggle('error',Boolean(errors.length));
@@ -499,7 +521,7 @@ function renderState(){
     const id=String(feature.properties.codarea);
     const name=state.names.get(id)||id;
     const region=state.regions.get(id)||'Sem classificação';
-    const description=`${name}, ${region}. ${demographicsText(id,true)}. ${indicatorText(name,true)}`;
+    const description=`${name}, ${region}. ${demographicsText(id,true)}. ${economicActivityText(id,true)}. ${indicatorText(name,true)}`;
     const path=el('path',{
       d:pathData(feature.geometry,project),class:'municipality','data-id':id,'data-name':name,
       'data-region':region,'data-base-color':REGION_COLORS[region]||'#ccd4cf',style:`--region-color:${REGION_COLORS[region]||'#ccd4cf'}`,
@@ -609,7 +631,7 @@ async function openCity(name){
 
   if(neighborhoodFeatures.length||name==='Fortaleza'){
     state.currentCity=name;
-    setContext(name.toLocaleUpperCase('pt-BR'),`${region} · ${neighborhoodFeatures.length||121} bairros · ${demographicsText(id,true)} · ${indicatorText(name,true)}`);
+    setContext(name.toLocaleUpperCase('pt-BR'),`${region} · ${neighborhoodFeatures.length||121} bairros · ${demographicsText(id,true)} · ${economicActivityText(id,true)} · ${indicatorText(name,true)}`);
     await showNeighborhoods(name,region);
   }else{
     state.currentCity=null;
@@ -618,7 +640,7 @@ async function openCity(name){
     regionBoundaryLayer.style.display='';
     $('#regionLegend').classList.remove('hidden');
     setMunicipalitySelection(id);
-    setContext(name.toLocaleUpperCase('pt-BR'),`${region} · sem malha oficial de bairros · ${demographicsText(id,true)} · ${indicatorText(name,true)}`);
+    setContext(name.toLocaleUpperCase('pt-BR'),`${region} · sem malha oficial de bairros · ${demographicsText(id,true)} · ${economicActivityText(id,true)} · ${indicatorText(name,true)}`);
     zoomToMunicipality(id);
     applyMetric();
     renderOperationalPoints();
@@ -657,7 +679,9 @@ async function showNeighborhoods(name,region){
       const neighborhoodDetails=()=>{
         const ais=aisForNeighborhood(name,districtName)||aisForMunicipality(name);
         const value=ais?state.metricValues?.get(ais):null;
-        return ais?`${districtName}\n${name} · ${ais.replace('AIS','AIS ')}\n${formatMetricValue(value,'ocorrências')}`:`${districtName}\n${name} · ${region}`;
+        const id=state.idsByName.get(name);
+        const heading=ais?`${districtName}\n${name} · ${ais.replace('AIS','AIS ')}\n${formatMetricValue(value,'ocorrências')}`:`${districtName}\n${name} · ${region}`;
+        return[heading,demographicsText(id),economicActivityText(id),indicatorText(name)].filter(Boolean).join('\n');
       };
       path.addEventListener('pointermove',event=>{label.classList.add('active');showTip(neighborhoodDetails(),event)});
       path.addEventListener('pointerleave',()=>{if(!path.classList.contains('selected'))label.classList.remove('active');hideTip()});
@@ -668,7 +692,9 @@ async function showNeighborhoods(name,region){
         path.classList.add('selected');label.classList.add('active');
         const ais=aisForNeighborhood(name,districtName)||aisForMunicipality(name);
         const value=ais?state.metricValues?.get(ais):null;
-        setContext(districtName.toLocaleUpperCase('pt-BR'),ais?`${name} · ${ais.replace('AIS','AIS ')} · ${formatMetricValue(value,'ocorrências')}`:`${name} · ${region} · bairro selecionado`);
+        const id=state.idsByName.get(name);
+        const territorialContext=ais?`${name} · ${ais.replace('AIS','AIS ')} · ${formatMetricValue(value,'ocorrências')}`:`${name} · ${region} · bairro selecionado`;
+        setContext(districtName.toLocaleUpperCase('pt-BR'),`${territorialContext} · ${demographicsText(id,true)} · ${economicActivityText(id,true)} · ${indicatorText(name,true)}`);
       });
     });
     labelRecords.sort((a,b)=>b.area-a.area).slice(0,Math.min(18,labelRecords.length)).forEach(item=>item.label.classList.add('major'));

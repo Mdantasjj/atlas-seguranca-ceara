@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="description" content="Mapa territorial do Ceará com municípios, regiões de planejamento, bairros e indicadores oficiais do IPECE.">
+  <meta name="theme-color" content="#ffffff">
+  <title>Visão territorial · Ceará</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="map-stage" aria-label="Mapa interativo do Ceará">
+      <div class="map-grid" aria-hidden="true"></div>
+
+      <div class="map-toolbar" role="search">
+        <div class="search-control">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+          <label class="sr-only" for="citySearch">Localizar município</label>
+          <input id="citySearch" autocomplete="off" placeholder="Localizar município" aria-controls="searchResults" aria-expanded="false">
+          <kbd>/</kbd>
+        </div>
+        <div class="search-results" id="searchResults" role="listbox" aria-label="Municípios encontrados"></div>
+      </div>
+
+      <div class="map-context" id="mapContext" aria-live="polite">
+        <strong>CEARÁ</strong>
+        <span>184 municípios · 14 regiões de planejamento</span>
+      </div>
+
+      <svg id="mapSvg" viewBox="0 0 900 760" role="img" aria-label="Mapa do Ceará dividido por municípios">
+        <g id="municipalityLayer"></g>
+        <g id="regionBoundaryLayer"></g>
+        <g id="neighborhoodLayer"></g>
+        <g id="neighborhoodLabelLayer"></g>
+        <g id="customGeometryLayer"></g>
+        <g id="pointLayer"></g>
+      </svg>
+
+      <div class="map-loading" id="mapLoading"><span></span>VALIDANDO BASE TERRITORIAL</div>
+
+      <div class="map-controls" aria-label="Controles do mapa">
+        <button id="zoomIn" type="button" aria-label="Ampliar mapa">+</button>
+        <button id="zoomOut" type="button" aria-label="Reduzir mapa">−</button>
+        <button id="resetView" type="button" aria-label="Voltar ao mapa do Ceará">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M8 21H3v-5m13 5h5v-5"/></svg>
+        </button>
+        <button id="dataButton" type="button" aria-label="Dados e camadas" aria-expanded="false" aria-controls="dataPanel">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18V9m6 9V5m6 13v-7m4 7H2"/></svg>
+        </button>
+        <button id="infoButton" type="button" aria-label="Fontes e metodologia">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 7.5v.2"/></svg>
+        </button>
+      </div>
+
+      <div class="scale-block" id="scaleBlock" aria-hidden="true"><span></span><b>100 km</b></div>
+      <div class="region-legend" id="regionLegend" aria-label="Legenda das regiões de planejamento">
+        <div class="legend-heading"><strong>REGIÕES DE PLANEJAMENTO</strong><span>IPECE · 2025</span></div>
+        <div class="legend-items" id="legendItems"></div>
+      </div>
+
+      <div class="data-quality" id="dataQuality" aria-live="polite">
+        <span></span><b>BASE EM VALIDAÇÃO</b>
+      </div>
+
+      <aside class="data-panel" id="dataPanel" aria-hidden="true" aria-label="Dados e camadas analíticas">
+        <div class="data-panel-head">
+          <div><small>ANÁLISE TERRITORIAL</small><strong>Dados e camadas</strong></div>
+          <button id="dataPanelClose" type="button" aria-label="Fechar painel">×</button>
+        </div>
+
+        <section class="data-section">
+          <label for="metricSelect">Indicador exibido</label>
+          <select id="metricSelect"></select>
+          <label for="levelSelect">Unidade territorial</label>
+          <select id="levelSelect">
+            <option value="municipio">Município</option>
+            <option value="regiao">Região de planejamento</option>
+            <option value="bairro">Bairro</option>
+            <option value="distrito">Distrito</option>
+            <option value="localidade">Localidade</option>
+          </select>
+          <p class="field-note" id="metricNote">A base regional do IPECE permanece como visualização padrão.</p>
+        </section>
+
+        <section class="data-section">
+          <div class="section-title"><span>Camadas pontuais</span><b id="pointCount">0 registros</b></div>
+          <label class="check-row"><input id="occurrenceToggle" type="checkbox" disabled><span>Ocorrências georreferenciadas</span></label>
+          <label class="check-row"><input id="resourceToggle" type="checkbox" disabled><span>Efetivo, viaturas e equipamentos</span></label>
+        </section>
+
+        <section class="data-section import-section">
+          <div class="section-title"><span>Carregar dados</span><b>CSV · JSON · GEOJSON</b></div>
+          <button class="import-button" id="importButton" type="button">Selecionar arquivos</button>
+          <input id="dataFileInput" type="file" accept=".csv,.json,.geojson" multiple hidden>
+          <p class="field-note">Processamento local: os arquivos não são enviados para a internet.</p>
+          <div class="import-status" id="importStatus">Nenhum dado operacional carregado.</div>
+        </section>
+
+        <div class="data-summary" id="dataSummary">
+          <div><strong>0</strong><span>indicadores</span></div>
+          <div><strong>0</strong><span>ocorrências</span></div>
+          <div><strong>0</strong><span>recursos</span></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <dialog id="infoDialog">
+    <button id="dialogClose" type="button" aria-label="Fechar">×</button>
+    <div class="eyebrow">FONTES E METODOLOGIA</div>
+    <h2>Base territorial validada</h2>
+    <dl class="source-list">
+      <div><dt>Regiões</dt><dd>14 Regiões de Planejamento do Estado do Ceará · IPECE/SEPLAG, mapa 2025.</dd></div>
+      <div><dt>Indicadores</dt><dd>IDM Global 2019–2022 para os 184 municípios · IPECE. PIB municipal 2023 para municípios destacados no informe IPECE/IBGE.</dd></div>
+      <div><dt>Municípios</dt><dd>Malha político-administrativa e nomenclatura municipal · IBGE.</dd></div>
+      <div><dt>Bairros</dt><dd>Malha oficial disponível para 105 municípios. Fortaleza utiliza Prefeitura/IPLANFOR; demais recortes utilizam a malha de setores do Censo 2022.</dd></div>
+      <div><dt>Novos dados</dt><dd>O painel aceita indicadores, ocorrências, recursos e geometrias em CSV, JSON ou GeoJSON. O processamento do arquivo é feito localmente no navegador.</dd></div>
+    </dl>
+    <p class="method-note">Não inclua nomes de vítimas, documentos, telefones ou outros dados pessoais. Ocorrências sensíveis devem ser anonimizadas ou agregadas antes da visualização.</p>
+  </dialog>
+
+  <div class="tooltip" id="tooltip" role="status"></div>
+  <script src="data/data-schema.js"></script>
+  <script src="data/data-engine.js"></script>
+  <script src="data/operational-data.js"></script>
+  <script src="data/map-data.js"></script>
+  <script src="data/ipece-indicadores.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+window.ATLAS_DATA_PACKAGE={
+  version:'1.0.0',
+  updatedAt:null,
+  source:null,
+  indicadores:[],
+  ocorrencias:[],
+  recursos:[],
+  geometrias:{distritos:null,bairros:null,localidades:null}
+};
